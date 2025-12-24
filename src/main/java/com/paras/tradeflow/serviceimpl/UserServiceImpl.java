@@ -1,5 +1,5 @@
 package com.paras.tradeflow.serviceimpl;
-
+import com.paras.tradeflow.dto.UserLoginRequest;
 import com.paras.tradeflow.dto.UserRegisterRequest;
 import com.paras.tradeflow.dto.UserResponse;
 import com.paras.tradeflow.entity.User;
@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserResponse register(UserRegisterRequest request) {
+    public UserResponse register( UserRegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail()))
             throw new RuntimeException("Email already exists");
@@ -32,5 +32,22 @@ public class UserServiceImpl implements UserService {
         return new UserResponse(savedUser.getId(),savedUser.getName(),savedUser.getEmail());
 
 
+    }
+
+    @Override
+    public UserResponse login(UserLoginRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid Email"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword()))
+            throw new RuntimeException("Invalid Password");
+
+
+        return UserResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .build();
     }
 }
