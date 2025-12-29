@@ -1,9 +1,11 @@
 package com.paras.tradeflow.serviceimpl;
+import com.paras.tradeflow.dto.AuthResponse;
 import com.paras.tradeflow.dto.UserLoginRequest;
 import com.paras.tradeflow.dto.UserRegisterRequest;
 import com.paras.tradeflow.dto.UserResponse;
 import com.paras.tradeflow.entity.User;
 import com.paras.tradeflow.repository.UserRepository;
+import com.paras.tradeflow.security.jwt.JwtService;
 import com.paras.tradeflow.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,27 +17,29 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
 
     @Override
-    public UserResponse register( UserRegisterRequest request) {
+    public UserResponse register(UserRegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail()))
             throw new RuntimeException("Email already exists");
+
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        User savedUser = userRepository.save(user);
+        userRepository.save(user);
 
-        return new UserResponse(savedUser.getId(),savedUser.getName(),savedUser.getEmail());
+        return new UserResponse(user.getId(),user.getName(),user.getEmail());
 
 
     }
 
     @Override
-    public UserResponse login(UserLoginRequest request) {
+    public AuthResponse login(UserLoginRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid Email"));
@@ -43,11 +47,8 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword()))
             throw new RuntimeException("Invalid Password");
 
+        String token = jwtService.generateToken(user.getEmail());
 
-        return UserResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .build();
+        return new AuthResponse(token);
     }
 }

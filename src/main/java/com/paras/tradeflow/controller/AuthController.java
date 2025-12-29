@@ -1,5 +1,6 @@
 package com.paras.tradeflow.controller;
 
+import com.paras.tradeflow.dto.AuthResponse;
 import com.paras.tradeflow.dto.UserLoginRequest;
 import com.paras.tradeflow.dto.UserRegisterRequest;
 import com.paras.tradeflow.dto.UserResponse;
@@ -25,7 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login (@RequestBody UserLoginRequest request){
+    public ResponseEntity<AuthResponse> login (@RequestBody UserLoginRequest request){
         return ResponseEntity.ok(userService.login(request));
     }
 
