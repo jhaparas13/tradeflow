@@ -6,6 +6,7 @@ import com.paras.tradeflow.dto.UserResponse;
 import com.paras.tradeflow.entity.User;
 import com.paras.tradeflow.repository.UserRepository;
 import com.paras.tradeflow.security.jwt.JwtService;
+import com.paras.tradeflow.service.RefreshTokenService;
 import com.paras.tradeflow.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +19,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
 
     @Override
@@ -47,8 +49,8 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword()))
             throw new RuntimeException("Invalid Password");
 
-        String token = jwtService.generateToken(user.getEmail());
-
-        return new AuthResponse(token);
+        String accessToken = jwtService.generateToken(user.getEmail());
+        String refreshToken = refreshTokenService.create(user).getToken();
+        return new AuthResponse(accessToken,refreshToken);
     }
 }
