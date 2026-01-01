@@ -37,11 +37,11 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
 
-        String refreshToken = refreshTokenRequest.getRefreshToken();
-        RefreshToken rt = refreshTokenService.verify(refreshToken);
-        String newAccessToken = jwtService.generateToken(rt.getUser().getEmail());
+        String oldRefreshToken = refreshTokenRequest.getRefreshToken();
+        RefreshToken newRefreshToken = refreshTokenService.verify(oldRefreshToken);
+        String newAccessToken = jwtService.generateToken(newRefreshToken.getUser().getEmail());
 
-        return ResponseEntity.ok(new AuthResponse(newAccessToken,refreshToken));
+        return ResponseEntity.ok(new AuthResponse(newAccessToken, newRefreshToken.getToken()));
     }
 
 
