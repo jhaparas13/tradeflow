@@ -7,6 +7,7 @@ import com.paras.tradeflow.service.RefreshTokenService;
 import com.paras.tradeflow.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,6 +43,12 @@ public class AuthController {
         String newAccessToken = jwtService.generateToken(newRefreshToken.getUser().getEmail());
 
         return ResponseEntity.ok(new AuthResponse(newAccessToken, newRefreshToken.getToken()));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout (@RequestBody RefreshTokenRequest refreshTokenRequest){
+        refreshTokenService.logout(refreshTokenRequest.getRefreshToken());
+        return ResponseEntity.noContent().build();
     }
 
 

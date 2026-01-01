@@ -5,6 +5,7 @@ import com.paras.tradeflow.entity.User;
 import com.paras.tradeflow.repository.RefreshTokenRepository;
 import com.paras.tradeflow.repository.UserRepository;
 import com.paras.tradeflow.security.jwt.JwtService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
@@ -37,11 +39,6 @@ public class RefreshTokenService {
         Optional<RefreshToken> refreshTokenCheck = refreshTokenRepository.findByToken(token);
 
         if (refreshTokenCheck.isEmpty()){
-            String email = jwtService.extractEmail(token);
-            User user = userRepository.findByEmail(email).
-                    orElseThrow();
-
-            refreshTokenRepository.deleteByUser(user);
             throw new RuntimeException("Refresh Token Reuse Detected");
         }
         RefreshToken refreshToken = refreshTokenCheck.get();
@@ -49,5 +46,10 @@ public class RefreshTokenService {
             throw new RuntimeException("Refresh token expired");
         refreshTokenRepository.delete(refreshToken);
         return create(refreshToken.getUser());
+    }
+
+    public  void logout(String refreshToken)
+    {
+        refreshTokenRepository.deleteByToken(refreshToken);
     }
 }
