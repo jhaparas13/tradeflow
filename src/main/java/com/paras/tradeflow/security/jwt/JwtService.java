@@ -1,5 +1,6 @@
 package com.paras.tradeflow.security.jwt;
 
+import com.paras.tradeflow.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -22,9 +23,10 @@ public class JwtService {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    public String generateToken(String email){
+    public String generateToken(User user){
         return Jwts.builder()
-                .subject(email)
+                .subject(user.getEmail())
+                .claim("role",user.getRole().name())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis()+EXPIRATION_TIME))
                 .signWith(getSigningKey())
@@ -54,5 +56,9 @@ public class JwtService {
         return extractClaims(token)
                 .getExpiration()
                 .before(new Date());
+    }
+
+    public String extractRole(String token){
+        return extractClaims(token).get("role",String.class);
     }
 }
