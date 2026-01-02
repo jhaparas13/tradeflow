@@ -3,6 +3,7 @@ import com.paras.tradeflow.dto.AuthResponse;
 import com.paras.tradeflow.dto.UserLoginRequest;
 import com.paras.tradeflow.dto.UserRegisterRequest;
 import com.paras.tradeflow.dto.UserResponse;
+import com.paras.tradeflow.entity.Role;
 import com.paras.tradeflow.entity.User;
 import com.paras.tradeflow.repository.UserRepository;
 import com.paras.tradeflow.security.jwt.JwtService;
@@ -32,7 +33,7 @@ public class UserServiceImpl implements UserService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-
+        user.setRole(Role.CUSTOMER);
         userRepository.save(user);
 
         return new UserResponse(user.getId(),user.getName(),user.getEmail());
