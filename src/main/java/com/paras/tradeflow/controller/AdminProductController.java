@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.Path;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/products")
@@ -49,5 +50,10 @@ public class AdminProductController {
     public ResponseEntity<Void> deactivate(@PathVariable Long id){
         productService.deactivate(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> adminList() {
+        return ResponseEntity.ok(productService.getAllForAdmin());
     }
 }

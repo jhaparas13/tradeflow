@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -70,6 +71,22 @@ public class ProductServiceImpl implements ProductService {
 
         product.setStatus(ProductStatus.INACTIVE);
         productRepository.save(product);
+    }
+
+    @Override
+    public List<ProductResponse> getAllForAdmin() {
+        return productRepository.findAll()
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
+    @Override
+    public List<ProductResponse> getAllForCustomer() {
+        return productRepository.findByStatus(ProductStatus.ACTIVE)
+                .stream()
+                .map(this::map)
+                .toList();
     }
 
     private ProductResponse map(Product product){
