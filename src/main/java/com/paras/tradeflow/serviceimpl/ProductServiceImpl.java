@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -98,5 +97,13 @@ public class ProductServiceImpl implements ProductService {
                 .stockQuantity(product.getStockQuantity())
                 .status(product.getStatus())
                 .build();
+    }
+
+    @Override
+    public boolean isInStock(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not Found"));
+
+        return product.getStatus() == ProductStatus.ACTIVE && product.getStockQuantity() >= quantity;
     }
 }

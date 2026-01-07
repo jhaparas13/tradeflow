@@ -14,4 +14,5 @@ public interface ProductService {
     void activate(Long id);
     List<ProductResponse> getAllForAdmin();
     List<ProductResponse> getAllForCustomer();
+    boolean isInStock(Long productId, int quantity);
 }
