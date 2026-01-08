@@ -1,5 +1,6 @@
 package com.paras.tradeflow.serviceimpl;
 
+import com.paras.tradeflow.dto.OrderResponse;
 import com.paras.tradeflow.entity.*;
 import com.paras.tradeflow.repository.OrderRepository;
 import com.paras.tradeflow.repository.ProductRepository;
@@ -8,6 +9,8 @@ import com.paras.tradeflow.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,12 +39,6 @@ public class OrderServiceImpl implements OrderService {
 
         product.setStockQuantity(product.getStockQuantity() - quantity);
 
-//        Order order = new Order();
-//        order.setUser(user);
-//        order.setProduct(product);
-//        order.setQuantity(quantity);
-//        order.setPriceAtPurchase(product.getPrice());
-
         Order order = Order.builder()
                 .user(user)
                 .product(product)
@@ -51,5 +48,25 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderRepository.save(order);
+    }
+
+    @Override
+    public List<OrderResponse> getMyOrders(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not Found"));
+
+        return orderRepository.findByUserOrderByCreatedAtDesc(user)
+                .stream()
+                .map(order -> OrderResponse.builder()
+                        .orderId(order.getId())
+                        .productId(order.getProduct().getId())
+                        .productName(order.getProduct().getName())
+                        .quantity(order.getQuantity())
+                        .priceAtPurchase(order.getPriceAtPurchase())
+                        .status(order.getStatus())
+                        .createdAt(order.getCreatedAt())
+                        .build())
+                .toList();
     }
 }
