@@ -29,9 +29,10 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/productst").hasAnyRole("CUSTOMER", "ADMIN")
-                        .requestMatchers("/api/admin/products/**").hasRole("ADMIN")
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/admin/products/**").hasRole("ADMIN")
+                        .requestMatchers("/api/products/**").hasAnyRole("CUSTOMER", "ADMIN")
+                        .requestMatchers("/api/orders/**").hasRole("CUSTOMER")
                         .anyRequest().authenticated()
                 ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

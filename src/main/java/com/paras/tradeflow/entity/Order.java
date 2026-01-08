@@ -12,6 +12,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "orders")
 public class Order {
 
     @Id
