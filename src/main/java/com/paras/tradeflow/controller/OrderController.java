@@ -29,4 +29,10 @@ public class OrderController {
     public ResponseEntity<List<OrderResponse>> myOrders(Authentication authentication) {
         return ResponseEntity.ok(orderService.getMyOrders(authentication.getName()));
     }
+
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId, Authentication auth) {
+        orderService.cancelOrder(orderId, auth.getName(), false);
+        return ResponseEntity.noContent().build();
+    }
 }

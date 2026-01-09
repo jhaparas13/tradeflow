@@ -3,12 +3,10 @@ package com.paras.tradeflow.controller;
 import com.paras.tradeflow.dto.AdminOrderResponse;
 import com.paras.tradeflow.entity.OrderStatus;
 import com.paras.tradeflow.service.AdminOrderService;
+import com.paras.tradeflow.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,6 +16,7 @@ import java.util.List;
 public class AdminOrderController {
 
     private final AdminOrderService adminOrderService;
+    private final OrderService orderService;
 
     @GetMapping
     public ResponseEntity<List<AdminOrderResponse>> getAllOrders(@RequestParam(required = false)OrderStatus status) {
@@ -26,4 +25,11 @@ public class AdminOrderController {
         }
         return  ResponseEntity.ok(adminOrderService.getOrdersByStatus(status));
     }
+
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<Void> cancel(@PathVariable Long orderId) {
+        orderService.cancelOrder(orderId, null, true);
+        return ResponseEntity.noContent().build();
+    }
+
 }

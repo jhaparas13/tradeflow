@@ -50,6 +50,26 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
     }
 
+    @Transactional
+    @Override
+    public void cancelOrder(Long orderId, String requesterEmail, boolean isAdmin) {
+
+        Order order = orderRepository.findByIdForUpdate(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not Found"));
+
+        if (!isAdmin && !order.getUser().getEmail().equals(requesterEmail)) {
+            throw new RuntimeException("Not allowed to cancel this Order");
+        }
+
+        if (order.getStatus() != OrderStatus.CREATED) {
+            throw new RuntimeException("Order cannot be Cancelled");
+        }
+
+        Product product = order.getProduct();
+        product.setStockQuantity(product.getStockQuantity() + order.getQuantity());
+        order.setStatus(OrderStatus.CANCELLED);
+    }
+
     @Override
     public List<OrderResponse> getMyOrders(String email) {
 
