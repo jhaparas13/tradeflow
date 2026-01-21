@@ -89,4 +89,27 @@ public class OrderServiceImpl implements OrderService {
                         .build())
                 .toList();
     }
+
+    @Override
+    @Transactional
+    public void handlePaymentFailure(Long orderId) {
+        Order order = orderRepository.findByIdForUpdate(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not Found"));
+
+        if (order.getStatus() != OrderStatus.CREATED) {
+            throw new RuntimeException("Order status is not 'CREATED' for handling payment Failure");
+        }
+
+        Product product = order.getProduct();
+        product.setStockQuantity(product.getStockQuantity() + order.getQuantity());
+        order.setStatus(OrderStatus.CANCELLED);
+    }
+
+    @Override
+    @Transactional
+    public void handlePaymentSuccess(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not Found"));
+        order.setStatus(OrderStatus.COMPLETED);
+    }
 }
