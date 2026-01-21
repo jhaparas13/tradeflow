@@ -7,6 +7,8 @@ import com.paras.tradeflow.entity.ProductStatus;
 import com.paras.tradeflow.repository.ProductRepository;
 import com.paras.tradeflow.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -81,11 +83,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getAllForCustomer() {
-        return productRepository.findByStatus(ProductStatus.ACTIVE)
-                .stream()
-                .map(this::map)
-                .toList();
+    public Page<ProductResponse> getAllForCustomer(Pageable pageable) {
+        return productRepository.findByStatus(ProductStatus.ACTIVE, pageable)
+                .map(this::map);
     }
 
     private ProductResponse map(Product product){
