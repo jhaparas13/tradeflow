@@ -106,4 +106,13 @@ public class ProductServiceImpl implements ProductService {
 
         return product.getStatus() == ProductStatus.ACTIVE && product.getStockQuantity() >= quantity;
     }
+
+    @Override
+    public Page<ProductResponse> ProductSearch(String name, Pageable pageable) {
+        return productRepository.findByStatusAndNameContainingIgnoreCase(
+                ProductStatus.ACTIVE,
+                name,
+                pageable
+        ).map(this::map);
+    }
 }

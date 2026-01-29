@@ -17,4 +17,5 @@ public interface ProductService {
     List<ProductResponse> getAllForAdmin();
     Page<ProductResponse> getAllForCustomer(Pageable pageable);
     boolean isInStock(Long productId, int quantity);
+    Page<ProductResponse> ProductSearch(String name, Pageable pageable);
 }

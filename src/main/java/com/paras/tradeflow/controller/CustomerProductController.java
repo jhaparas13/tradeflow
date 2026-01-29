@@ -51,4 +51,32 @@ public class CustomerProductController {
     public ResponseEntity<Boolean> checkStock(@PathVariable Long id, @RequestParam int quantity) {
         return ResponseEntity.ok(productService.isInStock(id, quantity));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<PageResponse<ProductResponse>> searchProducts(
+            @RequestParam String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String order
+    ) {
+        Sort sort = order.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<ProductResponse> result = productService.ProductSearch(name, pageable);
+
+        return ResponseEntity.ok(
+                new PageResponse<>(
+                        result.getContent(),
+                        result.getNumber(),
+                        result.getSize(),
+                        result.getTotalElements(),
+                        result.getTotalPages(),
+                        result.isLast()
+                )
+        );
+    }
 }
